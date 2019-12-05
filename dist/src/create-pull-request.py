@@ -237,7 +237,8 @@ author_email, author_name = get_author_default(event_name, event_data)
 author_email = os.getenv("COMMIT_AUTHOR_EMAIL", author_email)
 author_name = os.getenv("COMMIT_AUTHOR_NAME", author_name)
 # Set author
-author = "%s <%s>" % (author_name, author_email)
+#author = "%s <%s>" % (author_name, author_email)
+author = "Test <email@somewhere.com>"
 # Set git configuration
 set_git_config(repo.git, author_email, author_name)
 # Update URL for the 'origin' remote
