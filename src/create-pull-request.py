@@ -73,9 +73,9 @@ def checkout_branch(git, remote_exists, branch):
         git.checkout("HEAD", b=branch)
 
 
-def push_changes(git, branch, commit_message):
+def push_changes(git, branch, commit_message, author):
     git.add("-A")
-    git.commit(m=commit_message)
+    git.commit(author=author, m=commit_message)
     return git.push("-f", "--set-upstream", "origin", branch)
 
 
@@ -117,7 +117,7 @@ def create_project_card(github_repo, project_name, project_column_name, pull_req
     )
 
 
-def process_event(github_token, github_repository, repo, branch, base):
+def process_event(github_token, github_repository, repo, branch, base, author):
     # Fetch optional environment variables with default values
     commit_message = os.getenv(
         "COMMIT_MESSAGE", "Auto-committed changes by create-pull-request action"
@@ -141,7 +141,7 @@ def process_event(github_token, github_repository, repo, branch, base):
 
     # Push the local changes to the remote branch
     print("Pushing changes to 'origin/%s'" % branch)
-    push_result = push_changes(repo.git, branch, commit_message)
+    push_result = push_changes(repo.git, branch, commit_message, author)
     print(push_result)
 
     # Create the pull request
@@ -236,6 +236,8 @@ author_email, author_name = get_author_default(event_name, event_data)
 # Set commit author overrides
 author_email = os.getenv("COMMIT_AUTHOR_EMAIL", author_email)
 author_name = os.getenv("COMMIT_AUTHOR_NAME", author_name)
+# Set author
+author = "%s <%s>" % (author_name, author_email)
 # Set git configuration
 set_git_config(repo.git, author_email, author_name)
 # Update URL for the 'origin' remote
@@ -345,6 +347,6 @@ else:
 
 if repo.is_dirty() or len(repo.untracked_files) > 0:
     print("Modified or untracked files detected.")
-    process_event(github_token, github_repository, repo, branch, base)
+    process_event(github_token, github_repository, repo, branch, base, author)
 else:
     print("No modified or untracked files detected. Skipping.")
