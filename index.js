@@ -10,21 +10,24 @@ async function run() {
     core.debug(`src: ${src}`);
 
     // Setup Python from the tool cache
-    setupPython("3.8.0", "x64");
+    setupPython("3.8.x", "x64");
 
     // Install requirements
     await exec.exec("pip", [
       "install",
       "--requirement",
-      `${src}/requirements.txt`
+      `${src}/requirements.txt`,
+      "--no-index",
+      `--find-links=${__dirname}/vendor`
     ]);
 
     // Fetch action inputs
     const inputs = {
       token: core.getInput("token"),
+      path: core.getInput("path"),
       commitMessage: core.getInput("commit-message"),
-      commitAuthorEmail: core.getInput("author-email"),
-      commitAuthorName: core.getInput("author-name"),
+      committer: core.getInput("committer"),
+      author: core.getInput("author"),
       title: core.getInput("title"),
       body: core.getInput("body"),
       labels: core.getInput("labels"),
@@ -37,31 +40,30 @@ async function run() {
       branch: core.getInput("branch"),
       base: core.getInput("base"),
       branchSuffix: core.getInput("branch-suffix"),
-      debugEvent: core.getInput("debug-event")
     };
     core.debug(`Inputs: ${inspect(inputs)}`);
 
     // Set environment variables from inputs.
     if (inputs.token) process.env.GITHUB_TOKEN = inputs.token;
-    if (inputs.commitMessage) process.env.COMMIT_MESSAGE = inputs.commitMessage;
-    if (inputs.commitAuthorEmail) process.env.COMMIT_AUTHOR_EMAIL = inputs.commitAuthorEmail;
-    if (inputs.commitAuthorName) process.env.COMMIT_AUTHOR_NAME = inputs.commitAuthorName;
-    if (inputs.title) process.env.PULL_REQUEST_TITLE = inputs.title;
-    if (inputs.body) process.env.PULL_REQUEST_BODY = inputs.body;
-    if (inputs.labels) process.env.PULL_REQUEST_LABELS = inputs.labels;
-    if (inputs.assignees) process.env.PULL_REQUEST_ASSIGNEES = inputs.assignees;
-    if (inputs.reviewers) process.env.PULL_REQUEST_REVIEWERS = inputs.reviewers;
-    if (inputs.teamReviewers) process.env.PULL_REQUEST_TEAM_REVIEWERS = inputs.teamReviewers;
-    if (inputs.milestone) process.env.PULL_REQUEST_MILESTONE = inputs.milestone;
-    if (inputs.project) process.env.PROJECT_NAME = inputs.project;
-    if (inputs.projectColumn) process.env.PROJECT_COLUMN_NAME = inputs.projectColumn;
-    if (inputs.branch) process.env.PULL_REQUEST_BRANCH = inputs.branch;
-    if (inputs.base) process.env.PULL_REQUEST_BASE = inputs.base;
-    if (inputs.branchSuffix) process.env.BRANCH_SUFFIX = inputs.branchSuffix;
-    if (inputs.debugEvent) process.env.DEBUG_EVENT = inputs.debugEvent;
+    if (inputs.path) process.env.CPR_PATH = inputs.path;
+    if (inputs.commitMessage) process.env.CPR_COMMIT_MESSAGE = inputs.commitMessage;
+    if (inputs.committer) process.env.CPR_COMMITTER = inputs.committer;
+    if (inputs.author) process.env.CPR_AUTHOR = inputs.author;
+    if (inputs.title) process.env.CPR_TITLE = inputs.title;
+    if (inputs.body) process.env.CPR_BODY = inputs.body;
+    if (inputs.labels) process.env.CPR_LABELS = inputs.labels;
+    if (inputs.assignees) process.env.CPR_ASSIGNEES = inputs.assignees;
+    if (inputs.reviewers) process.env.CPR_REVIEWERS = inputs.reviewers;
+    if (inputs.teamReviewers) process.env.CPR_TEAM_REVIEWERS = inputs.teamReviewers;
+    if (inputs.milestone) process.env.CPR_MILESTONE = inputs.milestone;
+    if (inputs.project) process.env.CPR_PROJECT_NAME = inputs.project;
+    if (inputs.projectColumn) process.env.CPR_PROJECT_COLUMN_NAME = inputs.projectColumn;
+    if (inputs.branch) process.env.CPR_BRANCH = inputs.branch;
+    if (inputs.base) process.env.CPR_BASE = inputs.base;
+    if (inputs.branchSuffix) process.env.CPR_BRANCH_SUFFIX = inputs.branchSuffix;
 
     // Execute python script
-    await exec.exec("python", [`${src}/create-pull-request.py`]);
+    await exec.exec("python", [`${src}/create_pull_request.py`]);
   } catch (error) {
     core.setFailed(error.message);
   }

@@ -2,14 +2,16 @@ name: 'Create Pull Request'
 description: 'Creates a pull request for changes to your repository in the actions workspace'
 inputs:
   token:
-    description: 'The GitHub authentication token'
+    description: 'GITHUB_TOKEN or a repo scoped PAT'
     required: true
+  path:
+    description: 'Relative path under $GITHUB_WORKSPACE to the repository.'
   commit-message:
     description: 'The message to use when committing changes.'
-  author-email:
-    description: 'The email address of the commit author.'
-  author-name:
-    description: 'The name of the commit author.'
+  committer:
+    description: 'The committer name and email address.'
+  author:
+    description: 'The author name and email address.'
   title:
     description: 'The title of the pull request.'
   body:
@@ -31,7 +33,7 @@ inputs:
   branch:
     description: 'The pull request branch name.'
   base:
-    description: 'Sets the pull request base branch.'
+    description: 'The pull request base branch.'
   branch-suffix:
     description: 'The branch suffix type.'
 outputs:
